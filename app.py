@@ -1,5 +1,5 @@
 def main():
-    print("Hello from uci-results!")
+    print("Hello from uci-mtb-results!")
 
 
 if __name__ == "__main__":
