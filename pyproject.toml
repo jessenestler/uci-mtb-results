@@ -1,7 +1,7 @@
 [project]
-name = "uci-results"
+name = "uci-mtb-results"
 version = "0.1.0"
-description = "A python app built for scraping race results from the UCI website."
+description = "A python app built for scraping mountain bike race results from the UCI MTB website."
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
