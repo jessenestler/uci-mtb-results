@@ -1,0 +1,11 @@
+[project]
+name = "uci-results"
+version = "0.1.0"
+description = "A python app built for scraping race results from the UCI website."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "duckdb>=1.1.3",
+    "requests>=2.32.3",
+    "selenium>=4.27.1",
+]
