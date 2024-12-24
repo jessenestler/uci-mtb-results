@@ -25,29 +25,27 @@ class Scraper:
     def __init__(self, timeout: int = 10):
         """Initialize the PageScraper class."""
         self.timeout = timeout
-        self.driver = self._driver
-        self.wait = WebDriverWait(self.driver, self.timeout)
 
-    @property
-    def _driver(self):
-        """Return a Chrome driver instance."""
+    def _create_driver(self):
+        """Create a Chrome driver instance."""
         service = Service()
         options = webdriver.ChromeOptions()
         options.headless = True
-        driver = webdriver.Chrome(service=service, options=options)
-        return driver
+        return webdriver.Chrome(service=service, options=options)
 
     def get(self, url: str, params: dict = None) -> str:
         """Navigate to the page and return its HTML."""
-        # Append query parameters to the URL
-        if params:
-            url = f"{url}?{urlencode(params)}"
+        # Use a context manager to ensure the driver quits after usage
+        with self._create_driver() as driver:
+            wait = WebDriverWait(driver, self.timeout)
 
-        # Get the page url
-        self.driver.get(url)
-        self.wait.until(DocumentReadyState())
+            # Append query parameters to the URL
+            if params:
+                url = f"{url}?{urlencode(params)}"
 
-        return self.driver.page_source
+            driver.get(url)
+            wait.until(DocumentReadyState())
+            return driver.page_source
 
 
 class MTBEventPage(Scraper):
