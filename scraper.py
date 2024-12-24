@@ -48,7 +48,7 @@ class Scraper:
             return driver.page_source
 
 
-class MTBEventPage(Scraper):
+class MTBEventsPage(Scraper):
     """
     Scraper class for extracting mountain bike event details from the UCI
     official website.
