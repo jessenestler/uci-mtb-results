@@ -53,10 +53,10 @@ class MTBEventsPage(Scraper):
     Scraper class for extracting mountain bike event details from the UCI
     official website.
     """
-    url = "https://ucimtbworldseries.com/results"
+    base_url = "https://ucimtbworldseries.com/results"
     header = "Results by Event"
 
-    def __init__(self, timeout: int = 10):
+    def __init__(self, year: int = None, timeout: int = 10):
         """
         Initialize the MTBEventPage scraper.
 
@@ -68,6 +68,8 @@ class MTBEventsPage(Scraper):
             Timeout in seconds for the web driver, by default 10.
         """
         super().__init__(timeout)
+        self.year = year
+        self.url = f"{self.base_url}/{self.year}" if year else self.base_url
 
     def fetch_events(self, params: dict = None) -> List[Dict]:
         """
