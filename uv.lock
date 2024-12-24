@@ -296,7 +296,7 @@ wheels = [
 ]
 
 [[package]]
-name = "uci-results"
+name = "uci-mtb-results"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
