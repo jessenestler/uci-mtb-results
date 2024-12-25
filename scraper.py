@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import Dict, List, Optional
 from urllib.parse import urlencode
 
+import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -22,8 +23,9 @@ class DocumentReadyState:
 class Scraper:
     """Base class for all page scrapers."""
 
-    def __init__(self, timeout: int = 10):
+    def __init__(self,  use_selenium: bool, timeout: int = 10):
         """Initialize the PageScraper class."""
+        self.use_selenium = use_selenium
         self.timeout = timeout
 
     def _create_driver(self):
@@ -35,17 +37,23 @@ class Scraper:
 
     def get(self, url: str, params: dict = None) -> str:
         """Navigate to the page and return its HTML."""
-        # Use a context manager to ensure the driver quits after usage
-        with self._create_driver() as driver:
-            wait = WebDriverWait(driver, self.timeout)
+        if self.use_selenium:
+            # Use Selenium to get the page source
+            with self._create_driver() as driver:
+                wait = WebDriverWait(driver, self.timeout)
 
-            # Append query parameters to the URL
-            if params:
-                url = f"{url}?{urlencode(params)}"
+                # Append query parameters to the URL
+                if params:
+                    url = f"{url}?{urlencode(params)}"
 
-            driver.get(url)
-            wait.until(DocumentReadyState())
-            return driver.page_source
+                driver.get(url)
+                wait.until(DocumentReadyState())
+                return driver.page_source
+        else:
+            # Use requests to get the page source
+            response = requests.get(url, params=params, timeout=self.timeout)
+            response.raise_for_status()
+            return response.text
 
 
 class MTBEventsPage(Scraper):
@@ -56,7 +64,8 @@ class MTBEventsPage(Scraper):
     base_url = "https://ucimtbworldseries.com/results"
     header = "Results by Event"
 
-    def __init__(self, year: int = None, timeout: int = 10):
+    def __init__(self, year: int = None, use_selenium: bool = False,
+                 timeout: int = 10):
         """
         Initialize the MTBEventPage scraper.
 
@@ -67,7 +76,7 @@ class MTBEventsPage(Scraper):
         timeout : int, optional
             Timeout in seconds for the web driver, by default 10.
         """
-        super().__init__(timeout)
+        super().__init__(use_selenium, timeout)
         self.year = year
         self.url = f"{self.base_url}/{self.year}" if year else self.base_url
 
