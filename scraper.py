@@ -421,6 +421,7 @@ class MTBResultsPage(Scraper):
         super().__init__(use_selenium, timeout)
         self.url = url
         self.soup = self._create_soup()
+        self.table = self._find_main_table()
 
     def _create_soup(self) -> BeautifulSoup:
         """
@@ -443,4 +444,65 @@ class MTBResultsPage(Scraper):
         List[Dict]
             A list of dictionaries, each containing each athlete's results.
         """
-        pass
+        headers = self._extract_headers()
+        rows = self._extract_rows(self.table)
+
+        results_data = []
+
+        # Iterate through rows in pairs
+        for i in range(0, len(rows), 2):
+            high_level_row = rows[i]
+            rider_info = self._extract_row_data(high_level_row)
+            rider_dict = {headers[j]: rider_info[j]
+                          for j in range(len(rider_info))}
+
+            # Process details row
+            details_row = rows[i + 1]
+            splits_table = details_row.find('table')
+            splits_headers, splits_table_data = self._parse_result_details(
+                splits_table)
+            race_details = [
+                {splits_headers[k]: split[k] for k in range(len(split))}
+                for split in splits_table_data
+            ]
+            rider_dict["Race Details"] = race_details
+
+            results_data.append(rider_dict)
+
+        return results_data
+
+    def _find_main_table(self):
+        """Find and return the main results table."""
+        main_table = self.soup.find('table')
+        if not main_table:
+            raise ValueError("Main table not found.")
+        return main_table
+
+    def _extract_headers(self):
+        """Extract headers from the main table."""
+        return [th.text.strip() for th in self.table.thead.find_all('th')]
+
+    @staticmethod
+    def _extract_rows(table):
+        """Extract all rows from the main table body."""
+        try:
+            return table.tbody.find_all('tr', recursive=False)
+        except AttributeError:
+            return table.find_all('tr', recursive=False)
+
+    @staticmethod
+    def _extract_row_data(row):
+        """Parse a high-level row (odd rows)."""
+        return [td.text.strip() for td in row.find_all('td')]
+
+    def _parse_result_details(self, nested_table):
+        """Parse the nested splits table."""
+        details_data = []
+        details_rows = self._extract_rows(nested_table)
+        details_headers = self._extract_row_data(details_rows[0])
+
+        for details_row in details_rows[1:]:  # Skip header row
+            details_cols = self._extract_row_data(details_row)
+            details_data.append(details_cols)
+
+        return details_headers, details_data
