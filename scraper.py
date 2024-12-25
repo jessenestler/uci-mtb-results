@@ -410,3 +410,37 @@ class MTBRacesPage(Scraper):
         result_links = self.soup.find_all(
             'a', href=lambda x: x and 'results/' in x.lower())
         return [link.get('href') for link in result_links]
+
+
+class MTBResultsPage(Scraper):
+    """
+    Scraper class for extracting the results of a UCI World Cup event.
+    """
+    def __init__(self, url: str, use_selenium: bool = False,
+                 timeout: int = 10):
+        super().__init__(use_selenium, timeout)
+        self.url = url
+        self.soup = self._create_soup()
+
+    def _create_soup(self) -> BeautifulSoup:
+        """
+        Create a BeautifulSoup object from the page source.
+
+        Returns
+        -------
+        BeautifulSoup
+            The parsed HTML content of the page.
+        """
+        html_content = self.get(self.url)
+        return BeautifulSoup(html_content, 'html.parser')
+
+    def fetch_results(self) -> List[Dict]:
+        """
+        Extracts the results from the provided BeautifulSoup object.
+
+        Returns
+        -------
+        List[Dict]
+            A list of dictionaries, each containing each athlete's results.
+        """
+        pass
