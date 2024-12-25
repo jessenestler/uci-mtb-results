@@ -455,6 +455,7 @@ class MTBResultsPage(Scraper):
             rider_info = self._extract_row_data(high_level_row)
             rider_dict = {headers[j]: rider_info[j]
                           for j in range(len(rider_info))}
+            rider_dict["Nation"] = self._extract_nation(high_level_row)
 
             # Process details row
             details_row = rows[i + 1]
@@ -494,6 +495,13 @@ class MTBResultsPage(Scraper):
     def _extract_row_data(row):
         """Parse a high-level row (odd rows)."""
         return [td.text.strip() for td in row.find_all('td')]
+
+    @staticmethod
+    def _extract_nation(row: BeautifulSoup) -> Optional[str]:
+        """Extract the nation from the row's SVG flag tag."""
+        svg = row.find('svg', recursive=True,
+                       id=lambda x: x and x.startswith('flag-'))
+        return svg['id'].replace('flag-', '').upper() if svg else None
 
     def _parse_result_details(self, nested_table):
         """Parse the nested splits table."""
