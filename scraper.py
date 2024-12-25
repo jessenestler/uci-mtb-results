@@ -372,3 +372,14 @@ class MTBEventsPage(Scraper):
                     'a', href=lambda x: x and 'result' in x.lower())
                 return results_link.get('href') if results_link else None
         return None
+
+
+class MTBRacesPage(Scraper):
+    """
+    Scraper class for extracting links for results of every race at a UCI
+    World Cup event.
+    """
+    def __init__(self, url: str, use_selenium: bool = False,
+                 timeout: int = 10):
+        super().__init__(use_selenium, timeout)
+        self.url = url
