@@ -507,6 +507,18 @@ class MTBResultsPage(Scraper):
 
         return self._extract_results_with_details(headers, rows)
 
+    def _has_detailed_results(self) -> bool:
+        """
+        Determine if the table includes split/lap/stage times by checking for
+        split columns or x-show rows.
+
+        Returns
+        -------
+        bool
+            True if the table contains split/lap/stage times, otherwise False.
+        """
+        return self._has_detail_rows() or self._has_detail_column()
+
     def _has_detail_rows(self) -> bool:
         """
         Check if the main table has rows with an x-show attribute, indicating
