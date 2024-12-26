@@ -514,13 +514,7 @@ class MTBResultsPage(Scraper):
 
             # Process details row
             details_row = rows[i + 1]
-            splits_table = details_row.find('table')
-            splits_headers, splits_table_data = self._parse_result_details(
-                splits_table)
-            race_details = [
-                {splits_headers[k]: split[k] for k in range(len(split))}
-                for split in splits_table_data
-            ]
+            race_details = self._extract_detailed_result(details_row)
             rider_dict["Race Details"] = race_details
 
             results_data.append(rider_dict)
@@ -558,6 +552,36 @@ class MTBResultsPage(Scraper):
         rider_dict.update(self._extract_rider_and_team(row))
 
         return rider_dict
+
+    def _extract_detailed_result(self, row: BeautifulSoup) -> List[Dict]:
+        """
+        Extracts the lap/split/stage results for a rider from a given overall
+        race result.
+
+        Parameters
+        ----------
+        details_row : BeautifulSoup
+            The row of data from which to extract the rider's detailed results.
+
+        Returns
+        -------
+        List[Dict]
+            A list of dictionaries containing the rider's detailed results.
+        """
+        # Extract the splits table
+        splits_table = row.find('table')
+
+        # Extract the headers and data from the splits table
+        splits_headers, splits_table_data = self._parse_result_details(
+            splits_table)
+
+        # Parse the splits table data into a list of dictionaries
+        race_details = [
+            {splits_headers[k]: split[k] for k in range(len(split))}
+            for split in splits_table_data
+        ]
+
+        return race_details
 
     def _find_main_table(self):
         """Find and return the main results table."""
