@@ -440,6 +440,78 @@ class MTBRacesPage(Scraper):
         header_text = [header.text.strip() for header in headers]
         return list(filter(lambda x: ':' in x, header_text))
 
+    def _parse_race_info(self, names: List[str]) -> List[Dict]:
+        """
+        Parses a list of race names and extracts details such as discipline,
+        category, gender, and race type.
+
+        Parameters
+        ----------
+        names : List[str]
+            A list of race names to be parsed.
+
+        Returns
+        -------
+        List[Dict]
+            A list of dictionaries, each containing the extracted details for
+            a race. Each dictionary has the following keys:
+
+                - 'discipline': str or None
+                    The discipline of the race
+                    (e.g., "UCI World Cup", "Enduro Racing", "E-Enduro Racing")
+                    None if not found.
+                - 'category': str or None
+                    The category of the race
+                    (e.g., "Elite", "U23", "Junior", "Youth", "Master")
+                    None if not found.
+                - 'gender': str or None
+                    The gender category of the race
+                    (e.g., "Men", "Women")
+                    None if not found.
+                - 'race_type': str
+                    The type of the race
+                    (e.g., "Qualifier", "Semi-Finals", "Finals")
+                    Defaults to "Finals" if not specified.
+        """
+
+        extracted_details = []
+
+        for race_name in names:
+            # Default race type is Final unless specified
+            race_type = "Finals"
+
+            # Identify race type if explicitly mentioned
+            type_pattern = r"(Qualifier|Semi-Finals|Finals)"
+            type_match = re.search(type_pattern, race_name, re.IGNORECASE)
+            if type_match:
+                race_type = type_match.group(1)
+
+            # Extract discipline
+            disc_pattern = (r"(UCI\s[\w-]+\sWorld\sCup|"
+                            r"(?:E-)?Enduro\s[\w-]+\sRacing)")
+            disc_match = re.match(disc_pattern, race_name)
+            discipline = disc_match.group(0) if disc_match else None
+
+            # Extract category
+            category_pattern = r"(Elite|U\d+|Junior|Youth|Master[s]?\s\d+\+)"
+            category_match = re.search(category_pattern, race_name,
+                                       re.IGNORECASE)
+            category = category_match.group(1) if category_match else None
+
+            # Extract gender
+            gender_match = re.search(r"(Men|Women)", race_name, re.IGNORECASE)
+            gender = gender_match.group(1) if gender_match else None
+
+            # Append extracted details
+            extracted_details.append({
+                "discipline": discipline,
+                "category": category,
+                "gender": gender,
+                "race_type": race_type
+            })
+
+        return extracted_details
+
 
 class MTBResultsPage(Scraper):
     """
