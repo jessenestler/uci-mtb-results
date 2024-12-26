@@ -505,7 +505,11 @@ class MTBResultsPage(Scraper):
         headers = self._extract_headers()
         rows = self._extract_rows(self.table)
 
-        return self._extract_results_with_details(headers, rows)
+        # Check if the table contains detailed results, i.e., split/lap times
+        if self._has_detailed_results(headers):
+            return self._extract_results_with_details(headers, rows)
+
+        return self._extract_results_without_details(headers, rows)
 
     def _has_detailed_results(self, headers: List[str]) -> bool:
         """
