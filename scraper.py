@@ -509,6 +509,7 @@ class MTBRacesPage(Scraper):
 
             # Append extracted details
             extracted_details.append({
+                "race_name": race_name,
                 "discipline": discipline,
                 "category": category,
                 "gender": gender,
