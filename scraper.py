@@ -510,11 +510,7 @@ class MTBResultsPage(Scraper):
         # Iterate through rows in pairs
         for i in range(0, len(rows), 2):
             high_level_row = rows[i]
-            rider_info = self._extract_row_data(high_level_row)
-            rider_dict = {headers[j]: rider_info[j]
-                          for j in range(len(rider_info))}
-            rider_dict["Nation"] = self._extract_nation(high_level_row)
-            rider_dict.update(self._extract_rider_and_team(high_level_row))
+            rider_dict = self._extract_overall_result(headers, high_level_row)
 
             # Process details row
             details_row = rows[i + 1]
@@ -530,6 +526,38 @@ class MTBResultsPage(Scraper):
             results_data.append(rider_dict)
 
         return results_data
+
+    def _extract_overall_result(self, headers: List[str],
+                                row: BeautifulSoup) -> dict:
+        """
+        Extracts the overall result for a rider from a given row of data.
+
+        Parameters
+        ----------
+        headers : list of str
+            The list of column headers corresponding to the data in the row.
+        row : BeautifulSoup
+            The row of data from which to extract the rider's overall result.
+
+        Returns
+        -------
+        dict
+            A dictionary containing the rider's information, including nation
+            and team.
+        """
+
+        # Extract the rider information
+        rider_info = self._extract_row_data(row)
+
+        # Create a dictionary with the rider information
+        rider_dict = {headers[j]: rider_info[j]
+                      for j in range(len(rider_info))}
+
+        # Extract the nation, rider, and team information
+        rider_dict["Nation"] = self._extract_nation(row)
+        rider_dict.update(self._extract_rider_and_team(row))
+
+        return rider_dict
 
     def _find_main_table(self):
         """Find and return the main results table."""
