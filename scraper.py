@@ -397,7 +397,22 @@ class MTBRacesPage(Scraper):
         html_content = self.get(self.url)
         return BeautifulSoup(html_content, 'html.parser')
 
-    def fetch_result_urls(self) -> List[str]:
+    def fetch_result_urls(self) -> List[Dict]:
+        """
+        This method extracts race URLs and race names, then combines them into
+        a list of dictionaries, each containing a race name and its
+        corresponding results URL.
+
+        Returns
+        -------
+        List[Dict]
+            A list of dictionaries, each with 'race' and 'results_url' keys.
+        """
+        url = self._extract_results()
+        race = self._extract_races()
+        return [{'race_name': r, 'results_url': u} for r, u in zip(race, url)]
+
+    def _extract_results(self) -> List[str]:
         """
         Extracts links for every race results page from the provided
         BeautifulSoup object.
