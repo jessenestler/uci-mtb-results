@@ -507,7 +507,7 @@ class MTBResultsPage(Scraper):
 
         return self._extract_results_with_details(headers, rows)
 
-    def _has_detailed_results(self) -> bool:
+    def _has_detail_rows(self) -> bool:
         """
         Check if the main table has rows with an x-show attribute, indicating
         nested split/lap/stage times.
