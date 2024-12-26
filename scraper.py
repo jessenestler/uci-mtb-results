@@ -489,10 +489,13 @@ class MTBRacesPage(Scraper):
                 race_type = type_match.group(1)
 
             # Extract discipline
-            disc_pattern = (r"(UCI\s[\w-]+\sWorld\sCup|"
-                            r"(?:E-)?Enduro\s[\w-]+\sRacing)")
+            disc_pattern = (r"UCI\s([\w-]+)\sWorld\sCup|"
+                            r"((?:E-)?Enduro\s[\w-]+)\sRacing")
+
             disc_match = re.match(disc_pattern, race_name)
-            discipline = disc_match.group(0) if disc_match else None
+            if not disc_match:
+                discipline = None
+            discipline = disc_match.group(1) or disc_match.group(2)
 
             # Extract category
             category_pattern = r"(Elite|U\d+|Junior|Youth|Master[s]?\s\d+\+)"
