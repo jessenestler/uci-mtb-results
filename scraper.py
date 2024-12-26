@@ -507,6 +507,24 @@ class MTBResultsPage(Scraper):
 
         return self._extract_results_with_details(headers, rows)
 
+    def _has_detailed_results(self) -> bool:
+        """
+        Check if the main table has rows with an x-show attribute, indicating
+        nested split/lap/stage times.
+
+        Parameters
+        ----------
+        table : BeautifulSoup
+            The table element to check.
+
+        Returns
+        -------
+        bool
+            True if the table contains rows with x-show attribute, otherwise
+            False.
+        """
+        return self.table.find('tr', attrs={'x-show': True}) is not None
+
     def _extract_results_with_details(self, headers: list,
                                       rows: BeautifulSoup) -> List[Dict]:
         """
