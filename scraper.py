@@ -546,6 +546,25 @@ class MTBResultsPage(Scraper):
         details = ['splits', 'laps', 'stages']
         return any(keyword in headers for keyword in details)
 
+    def _extract_results_without_details(self, headers: list,
+                                         rows: BeautifulSoup) -> List[Dict]:
+        """
+        Extracts rider results from the provided BeautifulSoup object.
+
+        Parameters
+        ----------
+        headers : list of str
+            The list of column headers corresponding to the data in the row.
+        rows : BeautifulSoup
+            The row of data from which to extract the rider's overall result.
+
+        Returns
+        -------
+        List[Dict]
+            A list of dictionaries, each containing each athlete's results.
+        """
+        return [self._extract_overall_result(headers, row) for row in rows]
+
     def _extract_results_with_details(self, headers: list,
                                       rows: BeautifulSoup) -> List[Dict]:
         """
