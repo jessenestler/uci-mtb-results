@@ -507,17 +507,22 @@ class MTBResultsPage(Scraper):
 
         return self._extract_results_with_details(headers, rows)
 
-    def _has_detailed_results(self) -> bool:
+    def _has_detailed_results(self, headers: List[str]) -> bool:
         """
         Determine if the table includes split/lap/stage times by checking for
         split columns or x-show rows.
+
+        Parameters
+        ----------
+        headers : List[str]
+            The list of column headers corresponding to the data in the row.
 
         Returns
         -------
         bool
             True if the table contains split/lap/stage times, otherwise False.
         """
-        return self._has_detail_rows() or self._has_detail_column()
+        return self._has_detail_rows() or self._has_detail_column(headers)
 
     def _has_detail_rows(self) -> bool:
         """
@@ -532,9 +537,15 @@ class MTBResultsPage(Scraper):
         """
         return self.table.find('tr', attrs={'x-show': True}) is not None
 
-    def _has_detail_column(self) -> bool:
+    @staticmethod
+    def _has_detail_column(headers) -> bool:
         """
         Check if the table has columns for Splits, Laps, or Stages.
+
+        Parameters
+        ----------
+        headers : List[str]
+            The list of column headers corresponding to the data in the row.
 
         Returns
         -------
@@ -542,7 +553,7 @@ class MTBResultsPage(Scraper):
             True if the table contains a Splits, Laps, or Stages column,
             otherwise False.
         """
-        headers = [header.lower() for header in self._extract_headers()]
+        headers = [header.lower() for header in headers]
         details = ['splits', 'laps', 'stages']
         return any(keyword in headers for keyword in details)
 
