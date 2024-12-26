@@ -464,6 +464,40 @@ class MTBResultsPage(Scraper):
         html_content = self.get(self.url)
         return BeautifulSoup(html_content, 'html.parser')
 
+    def fetch_results_date(soup: BeautifulSoup) -> Optional[str]:
+        """
+        Extract the date of the race from first header whose text matches the
+        format `text:text:text:date`.
+
+        Parameters
+        ----------
+        soup : BeautifulSoup
+            The BeautifulSoup object containing the parsed HTML.
+
+        Returns
+        -------
+        Optional[str]
+            The header text if found, otherwise None.
+        """
+        # Find all headers (h1-h6)
+        header_tags = soup.find_all(lambda tag: tag.name in [
+                                    'h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
+        headers = [tag.text.strip() for tag in header_tags]
+        colon_headers = list(filter(lambda x: ':' in x, headers))
+
+        for text in colon_headers:
+            # Extract the last part after the last colon
+            date_str = text.split(':')[-1].strip()
+            potential_date = re.sub(r'(\d+)(st|nd|rd|th)', r'\1', date_str)
+            try:
+                # Try to parse it into a datetime object
+                # Example format: "11 Jun 2023"
+                return datetime.strptime(potential_date, "%d %b %Y")
+            except ValueError:
+                continue  # Skip if it cannot be parsed as a date
+
+        return None
+
     def fetch_results(self) -> List[Dict]:
         """
         Extracts the results from the provided BeautifulSoup object.
