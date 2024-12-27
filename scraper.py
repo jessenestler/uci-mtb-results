@@ -489,8 +489,7 @@ class MTBRacesPage(Scraper):
         races = list(filter(lambda x: ':' in x, header_text))
         return self._parse_race_info(races)
 
-    @staticmethod
-    def _parse_race_info(names: List[str]) -> List[Dict]:
+    def _parse_race_info(self, names: List[str]) -> List[Dict]:
         """
         Parses a list of race names and extracts details such as discipline,
         category, gender, and race type.
@@ -527,15 +526,6 @@ class MTBRacesPage(Scraper):
         extracted_details = []
 
         for race_name in names:
-            # Default race type is Final unless specified
-            race_type = "Finals"
-
-            # Identify race type if explicitly mentioned
-            type_pattern = r"(Qualifier|Semi-Finals|Finals)"
-            type_match = re.search(type_pattern, race_name, re.IGNORECASE)
-            if type_match:
-                race_type = type_match.group(1)
-
             # Extract discipline
             disc_pattern = (r"UCI\s([\w-]+)\sWorld\sCup|"
                             r"((?:E-)?Enduro\s[\w-]+)\sRacing")
@@ -561,10 +551,22 @@ class MTBRacesPage(Scraper):
                 "discipline": discipline,
                 "category": category,
                 "gender": gender,
-                "race_type": race_type
+                "race_type": self._extract_race_type(race_name)
             })
 
         return extracted_details
+
+    @staticmethod
+    def _extract_race_type(race_name):
+        # Default to "Finals"
+        race_type = "Finals"
+
+        # Identify race type if explicitly mentioned
+        type_pattern = r"(Qualifier|Semi-Finals|Finals)"
+        type_match = re.search(type_pattern, race_name, re.IGNORECASE)
+        if type_match:
+            race_type = type_match.group(1)
+        return race_type
 
 
 class MTBResultsPage(Scraper):
