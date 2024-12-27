@@ -526,15 +526,6 @@ class MTBRacesPage(Scraper):
         extracted_details = []
 
         for race_name in names:
-            # Extract discipline
-            disc_pattern = (r"UCI\s([\w-]+)\sWorld\sCup|"
-                            r"((?:E-)?Enduro\s[\w-]+)\sRacing")
-
-            disc_match = re.match(disc_pattern, race_name)
-            if not disc_match:
-                discipline = None
-            discipline = disc_match.group(1) or disc_match.group(2)
-
             # Extract category
             category_pattern = r"(Elite|U\d+|Junior|Youth|Master[s]?\s\d+\+)"
             category_match = re.search(category_pattern, race_name,
@@ -548,13 +539,43 @@ class MTBRacesPage(Scraper):
             # Append extracted details
             extracted_details.append({
                 "race_name": race_name,
-                "discipline": discipline,
+                "discipline": self._extract_discipline(race_name),
                 "category": category,
                 "gender": gender,
                 "race_type": self._extract_race_type(race_name)
             })
 
         return extracted_details
+
+    @staticmethod
+    def _extract_discipline(race_name):
+        """
+        Extracts the discipline from a given race name.
+
+        Parameters
+        ----------
+        race_name : str
+            The name of the race from which to extract the discipline.
+
+        Returns
+        -------
+        str or None
+            The extracted discipline if a match is found, otherwise None.
+
+        Notes
+        -----
+        The function uses a regular expression pattern to match and extract
+        the discipline from the race name. The pattern looks for disciplines
+        in the format of "UCI <discipline> World Cup" or "<discipline> Racing",
+        where <discipline> can include words and hyphens.
+        """
+        discipline_pattern = (r"UCI\s([\w-]+)\sWorld\sCup|"
+                              r"((?:E-)?Enduro\s[\w-]+)\sRacing")
+
+        match = re.match(discipline_pattern, race_name)
+        if not match:
+            return None
+        return match.group(1) or match.group(2)
 
     @staticmethod
     def _extract_race_type(race_name):
