@@ -61,6 +61,12 @@ class RaceResult(BaseModel):
     team: Optional[str]  # Example: "SCOTT-SRAM MTB RACING TEAM"
     details: List[Optional[ResultDetails]]  # Split/Lap details
 
+    @model_validator(mode="before")
+    def unify_points_fields(cls, values):
+        if "wsq_points" in values:
+            values["points"] = values.pop("wsq_points")
+        return values
+
     @field_validator("points", mode="before")
     def convert_non_digit_to_zero(cls, value):
         if not re.search(r"\d", str(value)):
