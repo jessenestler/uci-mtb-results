@@ -581,6 +581,7 @@ class MTBResultsPage(Scraper):
             A list of dictionaries, each containing each athlete's results.
         """
         headers = self._extract_headers()
+        headers = list(map(self._standardize_header, headers))
         rows = self._extract_rows(self.table)
 
         # Check if the table contains detailed results, i.e., split/lap times
@@ -690,7 +691,7 @@ class MTBResultsPage(Scraper):
             # Process details row
             details_row = rows[i + 1]
             race_details = self._extract_detailed_result(details_row)
-            rider_dict["Race Details"] = race_details
+            rider_dict["details"] = race_details
 
             results_data.append(rider_dict)
 
@@ -723,7 +724,7 @@ class MTBResultsPage(Scraper):
                       for j in range(len(rider_info))}
 
         # Extract the nation, rider, and team information
-        rider_dict["Nation"] = self._extract_nation(row)
+        rider_dict["nation"] = self._extract_nation(row)
         rider_dict.update(self._extract_rider_and_team(row))
 
         return rider_dict
@@ -751,12 +752,18 @@ class MTBResultsPage(Scraper):
             splits_table)
 
         # Parse the splits table data into a list of dictionaries
+        splits_headers = list(map(self._standardize_header, splits_headers))
         race_details = [
             {splits_headers[k]: split[k] for k in range(len(split))}
             for split in splits_table_data
         ]
 
         return race_details
+
+    @staticmethod
+    def _standardize_header(header: str) -> str:
+        """Standardize the header text."""
+        return header.lower().replace(' ', '_')
 
     def _find_main_table(self):
         """Find and return the main results table."""
@@ -795,7 +802,7 @@ class MTBResultsPage(Scraper):
         links = row.find_all('a', recursive=True, href=True)
         rider = links[1].text.strip() if links else ''
         team = links[2].text.strip() if links and len(links) > 2 else ''
-        return {"Rider": rider, "Team": team}
+        return {"rider": rider, "team": team}
 
     def _parse_result_details(self, nested_table):
         """Parse the nested splits table."""
