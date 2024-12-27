@@ -5,7 +5,7 @@ from urllib.parse import urlencode
 
 import requests
 from bs4 import BeautifulSoup
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
@@ -45,7 +45,7 @@ class ResultDetails(BaseModel):
 
 class RaceResult(BaseModel):
     """Schema for a race's overall results."""
-    position: Optional[int]  # Example: 1
+    position: Optional[str] = Field(alias="#")  # Example: 1
     rider: Optional[str]  # Example: "Nino Schurter"
     nation: Optional[str]  # Example: "CHE"
     time: Optional[str]  # Example: "01:24:04"
