@@ -144,7 +144,7 @@ class MTBEventsPage(Scraper):
 
         if results_heading:
             # Find all mt-1 divs under the "Results by Event" section
-            mt1_divs = self._find_mt1(results_heading)
+            mt1_divs = self._find_mt1s(results_heading)
             for mt1_div in mt1_divs:
                 events.append(self._extract_event_details(mt1_div))
 
@@ -171,7 +171,7 @@ class MTBEventsPage(Scraper):
             lambda tag: tag.name in headers and self.header in tag.text
         )
 
-    def _find_mt1(self, results_heading: BeautifulSoup) -> List[BeautifulSoup]:
+    def _find_mt1s(self, heading: BeautifulSoup) -> List[BeautifulSoup]:
         """
         This method searches for all `div` elements with the class 'mt-1' that
         are descendants of the provided `results_heading` element. On the UCI
@@ -180,9 +180,9 @@ class MTBEventsPage(Scraper):
 
         Parameters
         ----------
-        results_heading : BeautifulSoup
-            A BeautifulSoup object representing the header for results by
-            event.
+        heading : BeautifulSoup
+            A BeautifulSoup object representing the title of the Event Results
+            webpage.
 
         Returns
         -------
@@ -191,7 +191,7 @@ class MTBEventsPage(Scraper):
             with the class 'mt-1'.
         """
         pattern = re.compile(r'^mt-1$')
-        return results_heading.find_all_next('div', class_=pattern)
+        return heading.find_all_next('div', class_=pattern)
 
     def _extract_event_details(self, mt1_div: BeautifulSoup) -> Dict:
         """
