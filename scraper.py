@@ -11,6 +11,17 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 
 
+class BaseModelWithValidation(BaseModel):
+    """Base model with common validations."""
+
+    @model_validator(mode="before")
+    def replace_empty_with_none(cls, values):
+        # Iterate through all fields and replace "" with None
+        baddies = ["", "-"]
+        return {key: None if value in baddies else value
+                for key, value in values.items()}
+
+
 class EventDetails(BaseModel):
     """Schema for event details."""
     location: Optional[str]
@@ -32,7 +43,7 @@ class RaceInfo(BaseModel):
     url: Optional[str]
 
 
-class ResultDetails(BaseModel):
+class ResultDetails(BaseModelWithValidation):
     """Schema for split/lap/stage details. Depending on the race discipline,
     the details can be split, lap, or stage times."""
     section: Optional[str]  # Example: "Lap 1"
@@ -50,7 +61,7 @@ class ResultDetails(BaseModel):
         return values
 
 
-class RaceResult(BaseModel):
+class RaceResult(BaseModelWithValidation):
     """Schema for a race's overall results."""
     position: Optional[str] = Field(alias="#")  # Example: 1
     rider: Optional[str]  # Example: "Nino Schurter"
