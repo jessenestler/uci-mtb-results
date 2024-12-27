@@ -579,15 +579,27 @@ class MTBRacesPage(Scraper):
 
     @staticmethod
     def _extract_race_type(race_name):
-        # Default to "Finals"
-        race_type = "Finals"
+        """
+        Extracts the race type from the given race name.
 
-        # Identify race type if explicitly mentioned
+        Parameters
+        ----------
+        race_name : str
+            The name of the race from which to extract the race type.
+
+        Returns
+        -------
+        str
+            The extracted race type, which can be "Qualifier", "Semi-Finals",
+            or "Finals". Defaults to "Finals" if no specific race type is
+            found.
+        """
         type_pattern = r"(Qualifier|Semi-Finals|Finals)"
-        type_match = re.search(type_pattern, race_name, re.IGNORECASE)
-        if type_match:
-            race_type = type_match.group(1)
-        return race_type
+
+        match = re.search(type_pattern, race_name, re.IGNORECASE)
+        if not match:
+            return "Finals"
+        return match.group(1)
 
 
 class MTBResultsPage(Scraper):
