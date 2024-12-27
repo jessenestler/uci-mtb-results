@@ -475,14 +475,14 @@ class MTBRacesPage(Scraper):
             'a', href=lambda x: x and 'results/' in x.lower())
         return [link.get('href') for link in result_links]
 
-    def _parse_race_info(self, names: List[str]) -> List[Dict]:
+    def _parse_race_info(self, urls: List[str]) -> List[Dict]:
         """
         Parses race information from a list of race names.
 
         Parameters
         ----------
-        names : List[str]
-            A list of race names to be parsed.
+        urls : List[str]
+            A list of race result urls.
 
         Returns
         -------
@@ -496,12 +496,12 @@ class MTBRacesPage(Scraper):
                 - race_type: str or None
         """
         extracted_details = [{
-            "race_name": race_name,
-            "discipline": self._extract_discipline(race_name),
-            "category": self._extract_category(race_name),
-            "gender": self._extract_gender(race_name),
-            "race_type": self._extract_race_type(race_name)
-        } for race_name in names]
+            "url": url,
+            "discipline": self._extract_discipline(url),
+            "category": self._extract_category(url),
+            "gender": self._extract_gender(url),
+            "race_type": self._extract_race_type(url)
+        } for url in urls]
 
         return extracted_details
 
