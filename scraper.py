@@ -454,12 +454,9 @@ class MTBRacesPage(Scraper):
             such as: discipline, category, gender, race type, and url.
         """
         urls = self._extract_result_urls()
-        race_info = self._extract_races()
+        race_info = self._parse_race_info(urls)
 
-        return [
-            RaceInfo(**{**r, 'url': u}).model_dump()
-            for r, u in zip(race_info, urls)
-        ]
+        return [RaceInfo(**r).model_dump() for r in race_info]
 
     def _extract_result_urls(self) -> List[str]:
         """
