@@ -194,25 +194,25 @@ class MTBEventsPage(Scraper):
 
     def _extract_events(self, divs: List[BeautifulSoup]) -> List[Dict]:
         """
-        Extracts event details from a BeautifulSoup object representing an
-        event.
+        Extracts event details from the list of divs containing event
+        information on the results webpage.
 
         Parameters
         ----------
-        mt1_div : BeautifulSoup
-            A BeautifulSoup object containing the HTML of the event.
+        divs : List[BeautifulSoup]
+            A list of BeautifulSoup div elements containing event information.
 
         Returns
         -------
-        Dict
-            A dictionary containing the event details with the following keys:
-            - 'location': str or None
-            - 'start_date': str or None
-            - 'end_date': str or None
-            - 'country': str or None
-            - 'disciplines': list of str or None
-            - 'event_url': str or None
-            - 'results_url': str or None
+        List[Dict]
+            A list of dictionaries, each containing details of an event:
+                - 'location': The location of the event.
+                - 'start_date': The start date of the event.
+                - 'end_date': The end date of the event.
+                - 'country': The country where the event is held.
+                - 'disciplines': The disciplines involved in the event.
+                - 'event_url': The URL of the event.
+                - 'results_url': The URL for the event results.
         """
         events = []
         for div in divs:
