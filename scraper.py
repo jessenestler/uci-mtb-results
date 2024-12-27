@@ -137,18 +137,17 @@ class MTBEventsPage(Scraper):
         List[Dict]
             A list of dictionaries, each containing event details.
         """
-        events = []
-
         # Locate the "Results by Event" heading
         results_heading = self._find_heading()
 
-        if results_heading:
-            # Find all mt-1 divs under the "Results by Event" section
-            mt1_divs = self._find_mt1s(results_heading)
-            for mt1_div in mt1_divs:
-                events.append(self._extract_event_details(mt1_div))
+        if not results_heading:
+            return []
 
-        return events
+        # Find all mt-1 divs under the "Results by Event" section
+        mt1_divs = self._find_mt1s(results_heading)
+        events = self._extract_event_details(mt1_divs)
+
+        return [EventDetails(**event).model_dump() for event in events]
 
     def _find_heading(self) -> Optional[BeautifulSoup]:
         """
@@ -193,7 +192,7 @@ class MTBEventsPage(Scraper):
         pattern = re.compile(r'^mt-1$')
         return heading.find_all_next('div', class_=pattern)
 
-    def _extract_event_details(self, mt1_div: BeautifulSoup) -> Dict:
+    def _extract_event_details(self, divs: List[BeautifulSoup]) -> List[Dict]:
         """
         Extracts event details from a BeautifulSoup object representing an
         event.
@@ -215,22 +214,26 @@ class MTBEventsPage(Scraper):
             - 'event_url': str or None
             - 'results_url': str or None
         """
-        event_data = {
-            'location': self._extract_location(mt1_div),
-            'start_date': None,
-            'end_date': None,
-            'country': self._extract_country(mt1_div),
-            'disciplines': self._extract_disciplines(mt1_div),
-            'event_url': self._extract_event_url(mt1_div),
-            'results_url': self._extract_results_url(mt1_div),
-        }
+        events = []
+        for div in divs:
+            event_data = {
+                'location': self._extract_location(div),
+                'start_date': None,
+                'end_date': None,
+                'country': self._extract_country(div),
+                'disciplines': self._extract_disciplines(div),
+                'event_url': self._extract_event_url(div),
+                'results_url': self._extract_results_url(div),
+            }
 
-        # Extract start and end dates
-        date_range = self._extract_date_range(mt1_div)
-        if date_range:
-            event_data['start_date'], event_data['end_date'] = date_range
+            # Extract start and end dates
+            date_range = self._extract_date_range(div)
+            if date_range:
+                event_data['start_date'], event_data['end_date'] = date_range
 
-        return EventDetails(**event_data).model_dump()
+            events.append(event_data)
+
+        return events
 
     def _extract_location(self, mt1_div: BeautifulSoup) -> Optional[str]:
         """
