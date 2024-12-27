@@ -17,7 +17,7 @@ class EventDetails(BaseModel):
     start_date: Optional[datetime]
     end_date: Optional[datetime]
     country: Optional[str]
-    disciplines: Optional[List[str]]
+    disciplines: List[Optional[str]]
     event_url: Optional[str]
     results_url: Optional[str]
 
@@ -256,7 +256,7 @@ class MTBEventsPage(Scraper):
         if date_range:
             event_data['start_date'], event_data['end_date'] = date_range
 
-        return event_data
+        return EventDetails(**event_data).model_dump()
 
     def _extract_location(self, mt1_div: BeautifulSoup) -> Optional[str]:
         """
