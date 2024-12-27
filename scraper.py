@@ -145,7 +145,7 @@ class MTBEventsPage(Scraper):
 
         # Find all mt-1 divs under the "Results by Event" section
         mt1_divs = self._find_mt1s(results_heading)
-        events = self._extract_event_details(mt1_divs)
+        events = self._extract_events(mt1_divs)
 
         return [EventDetails(**event).model_dump() for event in events]
 
@@ -192,7 +192,7 @@ class MTBEventsPage(Scraper):
         pattern = re.compile(r'^mt-1$')
         return heading.find_all_next('div', class_=pattern)
 
-    def _extract_event_details(self, divs: List[BeautifulSoup]) -> List[Dict]:
+    def _extract_events(self, divs: List[BeautifulSoup]) -> List[Dict]:
         """
         Extracts event details from a BeautifulSoup object representing an
         event.
