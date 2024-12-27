@@ -126,33 +126,22 @@ class MTBEventsPage(Scraper):
         super().__init__(use_selenium, timeout)
         self.year = year
         self.url = f"{self.base_url}/{self.year}" if year else self.base_url
+        self.soup = self.get(self.url)
 
-    def fetch_events(self, params: dict = None) -> List[Dict]:
+    def fetch_events(self) -> List[Dict]:
         """
         Fetch and extract events from the page.
-
-        Parameters
-        ----------
-        params : dict, optional
-            Query parameters to append to the URL, by default None.
 
         Returns
         -------
         List[Dict]
             A list of dictionaries, each containing event details.
         """
-        html_content = self.get(self.url, params)
-        soup = BeautifulSoup(html_content, 'html.parser')
-        return self._extract_events(soup)
+        return self._extract_events()
 
-    def _extract_events(self, soup: BeautifulSoup) -> List[Dict]:
+    def _extract_events(self) -> List[Dict]:
         """
         Extract event details from the parsed HTML.
-
-        Parameters
-        ----------
-        soup : BeautifulSoup
-            Parsed HTML content.
 
         Returns
         -------
@@ -163,7 +152,7 @@ class MTBEventsPage(Scraper):
         events = []
 
         # Locate the "Results by Event" heading
-        results_heading = self._find_heading(soup)
+        results_heading = self._find_heading()
 
         if results_heading:
             # Find all mt-1 divs under the "Results by Event" section
@@ -173,15 +162,10 @@ class MTBEventsPage(Scraper):
 
         return events
 
-    def _find_heading(self, soup: BeautifulSoup) -> Optional[BeautifulSoup]:
+    def _find_heading(self) -> Optional[BeautifulSoup]:
         """
         Find the heading in the BeautifulSoup object that matches the
         specified header text.
-
-        Parameters
-        ----------
-        soup : BeautifulSoup
-            The BeautifulSoup object to search within.
 
         Returns
         -------
@@ -195,7 +179,7 @@ class MTBEventsPage(Scraper):
         specified header text is present in the tag's text.
         """
         headers = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']
-        return soup.find(
+        return self.soup.find(
             lambda tag: tag.name in headers and self.header in tag.text
         )
 
