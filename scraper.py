@@ -35,12 +35,11 @@ class EventDetails(BaseModel):
 
 class RaceInfo(BaseModel):
     """Schema for race information."""
-    race_name: str
+    url: str
     discipline: Optional[str]
     category: Optional[str]
     gender: Optional[str]
     race_type: str  # Defaults to "Finals" in the scraper logic
-    url: Optional[str]
 
 
 class ResultDetails(BaseModelWithValidation):
