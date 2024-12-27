@@ -402,19 +402,7 @@ class MTBRacesPage(Scraper):
                  timeout: int = 10):
         super().__init__(use_selenium, timeout)
         self.url = url
-        self.soup = self._create_soup()
-
-    def _create_soup(self) -> BeautifulSoup:
-        """
-        Create a BeautifulSoup object from the page source.
-
-        Returns
-        -------
-        BeautifulSoup
-            The parsed HTML content of the page.
-        """
-        html_content = self.get(self.url)
-        return BeautifulSoup(html_content, 'html.parser')
+        self.soup = self.get(self.url)
 
     def fetch_races(self) -> List[Dict]:
         """
