@@ -523,22 +523,38 @@ class MTBRacesPage(Scraper):
                     Defaults to "Finals" if not specified.
         """
 
-        extracted_details = []
-
-        for race_name in names:
-            gender_match = re.search(r"(Men|Women)", race_name, re.IGNORECASE)
-            gender = gender_match.group(1) if gender_match else None
-
-            # Append extracted details
-            extracted_details.append({
-                "race_name": race_name,
-                "discipline": self._extract_discipline(race_name),
-                "category": self._extract_category(race_name),
-                "gender": gender,
-                "race_type": self._extract_race_type(race_name)
-            })
+        extracted_details = [{
+            "race_name": race_name,
+            "discipline": self._extract_discipline(race_name),
+            "category": self._extract_category(race_name),
+            "gender": self._extract_gender(race_name),
+            "race_type": self._extract_race_type(race_name)
+        } for race_name in names]
 
         return extracted_details
+
+    @staticmethod
+    def _extract_gender(race_name):
+        """
+        Extracts the gender from a race name.
+
+        Parameters
+        ----------
+        race_name : str
+            The name of the race from which to extract the gender.
+
+        Returns
+        -------
+        str or None
+            Returns 'Men' or 'Women' if found in the race name, otherwise
+            returns None.
+        """
+        gender_pattern = r"(Men|Women)"
+
+        match = re.search(gender_pattern, race_name, re.IGNORECASE)
+        if not match:
+            return None
+        return match.group(1)
 
     @staticmethod
     def _extract_category(race_name):
