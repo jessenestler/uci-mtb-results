@@ -5,7 +5,7 @@ from urllib.parse import urlencode
 
 import requests
 from bs4 import BeautifulSoup
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
@@ -35,12 +35,19 @@ class RaceInfo(BaseModel):
 class ResultDetails(BaseModel):
     """Schema for split/lap/stage details. Depending on the race discipline,
     the details can be split, lap, or stage times."""
-    lap: Optional[str]  # Example: "Lap 1"
-    split: Optional[str]  # Example: "Split 1"
-    stage: Optional[str]  # Example: "Stage 1"
+    section: Optional[str]  # Example: "Lap 1"
     time: Optional[str]  # Example: "10:58.541"
     gap: Optional[str]  # Example: "00:00.000"
     position: Optional[int]  # Example: 2
+
+    @model_validator(mode="before")
+    def unify_section_fields(cls, values):
+        # Check for lap, split, or stage and funnel them into 'section'
+        for alias in ["lap", "split", "stage"]:
+            if alias in values:
+                values["section"] = values.pop(alias)
+                break
+        return values
 
 
 class RaceResult(BaseModel):
@@ -657,9 +664,12 @@ class MTBResultsPage(Scraper):
 
         # Check if the table contains detailed results, i.e., split/lap times
         if self._has_detailed_results(headers):
-            return self._extract_results_with_details(headers, rows)
+            results = self._extract_results_with_details(headers, rows)
+        else:
+            results = self._extract_results_without_details(headers, rows)
 
-        return self._extract_results_without_details(headers, rows)
+        # Validate the extracted results
+        return [RaceResult(**result).model_dump() for result in results]
 
     def _has_detailed_results(self, headers: List[str]) -> bool:
         """
