@@ -647,7 +647,6 @@ class MTBResultsPage(Scraper):
             A list of dictionaries, each containing each athlete's results.
         """
         headers = self._extract_headers()
-        headers = list(map(self._standardize_header, headers))
         rows = self._extract_rows(self.table)
 
         # Check if the table contains detailed results, i.e., split/lap times
@@ -818,18 +817,12 @@ class MTBResultsPage(Scraper):
             splits_table)
 
         # Parse the splits table data into a list of dictionaries
-        splits_headers = list(map(self._standardize_header, splits_headers))
         race_details = [
             {splits_headers[k]: split[k] for k in range(len(split))}
             for split in splits_table_data
         ]
 
         return race_details
-
-    @staticmethod
-    def _standardize_header(header: str) -> str:
-        """Standardize the header text."""
-        return header.lower().replace(' ', '_')
 
     def _find_main_table(self):
         """Find and return the main results table."""
@@ -838,9 +831,15 @@ class MTBResultsPage(Scraper):
             raise ValueError("Main table not found.")
         return main_table
 
+    @staticmethod
+    def _standardize_header(header: str) -> str:
+        """Standardize the header text."""
+        return header.lower().replace(' ', '_')
+
     def _extract_headers(self):
         """Extract headers from the main table."""
-        return [th.text.strip() for th in self.table.thead.find_all('th')]
+        headers = [th.text.strip() for th in self.table.thead.find_all('th')]
+        return list(map(self._standardize_header, headers))
 
     @staticmethod
     def _extract_rows(table):
@@ -874,7 +873,10 @@ class MTBResultsPage(Scraper):
         """Parse the nested splits table."""
         details_data = []
         details_rows = self._extract_rows(nested_table)
-        details_headers = self._extract_row_data(details_rows[0])
+        details_headers = list(
+            map(self._standardize_header,
+                self._extract_row_data(details_rows[0]))
+        )
 
         for details_row in details_rows[1:]:  # Skip header row
             details_cols = self._extract_row_data(details_row)
