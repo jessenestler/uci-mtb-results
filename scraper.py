@@ -52,7 +52,7 @@ class RaceResult(BaseModel):
     gap: Optional[str]  # Example: "+00:00:15"
     points: Optional[int]  # Example: 250
     team: Optional[str]  # Example: "SCOTT-SRAM MTB RACING TEAM"
-    details: Optional[List[ResultDetails]]  # Split/Lap details
+    details: List[Optional[Dict]]  # Split/Lap details
 
 
 class DocumentReadyState:
