@@ -526,13 +526,6 @@ class MTBRacesPage(Scraper):
         extracted_details = []
 
         for race_name in names:
-            # Extract category
-            category_pattern = r"(Elite|U\d+|Junior|Youth|Master[s]?\s\d+\+)"
-            category_match = re.search(category_pattern, race_name,
-                                       re.IGNORECASE)
-            category = category_match.group(1) if category_match else None
-
-            # Extract gender
             gender_match = re.search(r"(Men|Women)", race_name, re.IGNORECASE)
             gender = gender_match.group(1) if gender_match else None
 
@@ -540,12 +533,41 @@ class MTBRacesPage(Scraper):
             extracted_details.append({
                 "race_name": race_name,
                 "discipline": self._extract_discipline(race_name),
-                "category": category,
+                "category": self._extract_category(race_name),
                 "gender": gender,
                 "race_type": self._extract_race_type(race_name)
             })
 
         return extracted_details
+
+    @staticmethod
+    def _extract_category(race_name):
+        """
+        Extracts the category from a race name string.
+
+        Parameters
+        ----------
+        race_name : str
+            The name of the race from which to extract the category.
+
+        Returns
+        -------
+        str or None
+            The extracted category if a match is found, otherwise None.
+
+        Notes
+        -----
+        The function uses a regular expression to search for categories such as
+        'Elite', 'U23', 'Junior', 'Youth', 'Masters 30+', etc., in a
+        case-insensitive manner.
+        """
+
+        category_pattern = r"(Elite|U\d+|Junior|Youth|Master[s]?\s\d+\+)"
+
+        match = re.search(category_pattern, race_name, re.IGNORECASE)
+        if not match:
+            return None
+        return match.group(1)
 
     @staticmethod
     def _extract_discipline(race_name):
