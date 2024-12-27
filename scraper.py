@@ -792,6 +792,9 @@ class MTBResultsPage(Scraper):
         rider_dict["nation"] = self._extract_nation(row)
         rider_dict.update(self._extract_rider_and_team(row))
 
+        # Add an empty list for details
+        rider_dict["details"] = []
+
         return rider_dict
 
     def _extract_detailed_result(self, row: BeautifulSoup) -> List[Dict]:
