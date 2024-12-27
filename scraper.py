@@ -24,11 +24,11 @@ class EventDetails(BaseModel):
 
 class RaceInfo(BaseModel):
     """Schema for race information."""
+    race_name: str
     discipline: Optional[str]
     category: Optional[str]
     gender: Optional[str]
     race_type: str  # Defaults to "Finals" in the scraper logic
-    race_name: str
     url: Optional[str]
 
 
@@ -457,7 +457,10 @@ class MTBRacesPage(Scraper):
 
         # Parse race names
         race_info = self._parse_race_info(races)
-        return [{**r, 'url': u} for r, u in zip(race_info, urls)]
+        return [
+            RaceInfo(**{**r, 'url': u}).model_dump()
+            for r, u in zip(race_info, urls)
+        ]
 
     def _extract_result_urls(self) -> List[str]:
         """
