@@ -475,21 +475,6 @@ class MTBRacesPage(Scraper):
             'a', href=lambda x: x and 'results/' in x.lower())
         return [link.get('href') for link in result_links]
 
-    def _extract_races(self) -> List[str]:
-        """
-        Extracts the names of the races from the provided BeautifulSoup object.
-
-        Returns
-        -------
-        List[str]
-            A list of race names extracted from the headers.
-        """
-        headers = self.soup.find_all(lambda tag: tag.name in [
-            'h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
-        header_text = [header.text.strip() for header in headers]
-        races = list(filter(lambda x: ':' in x, header_text))
-        return self._parse_race_info(races)
-
     def _parse_race_info(self, names: List[str]) -> List[Dict]:
         """
         Parses race information from a list of race names.
