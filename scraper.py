@@ -235,7 +235,8 @@ class MTBEventsPage(Scraper):
 
         return events
 
-    def _extract_location(self, mt1_div: BeautifulSoup) -> Optional[str]:
+    @staticmethod
+    def _extract_location(mt1_div: BeautifulSoup) -> Optional[str]:
         """
         Extracts the location from the given BeautifulSoup object.
 
@@ -253,7 +254,8 @@ class MTBEventsPage(Scraper):
         details = mt1_div.find_all('div')
         return details[1].text.strip() if len(details) >= 1 else None
 
-    def _extract_date_range(self, mt1_div: BeautifulSoup) -> Optional[tuple]:
+    @staticmethod
+    def _extract_date_range(mt1_div: BeautifulSoup) -> Optional[tuple]:
         """
         Extracts a date range from the provided BeautifulSoup object.
 
@@ -310,7 +312,8 @@ class MTBEventsPage(Scraper):
 
         return None
 
-    def _extract_country(self, mt1_div: BeautifulSoup) -> Optional[str]:
+    @staticmethod
+    def _extract_country(mt1_div: BeautifulSoup) -> Optional[str]:
         """
         Extracts the country code from the given BeautifulSoup div element.
 
@@ -332,7 +335,8 @@ class MTBEventsPage(Scraper):
                 return flag_svg.get('id', '').replace('flag-', '')
         return None
 
-    def _extract_disciplines(self, mt1_div: BeautifulSoup) -> List[str]:
+    @staticmethod
+    def _extract_disciplines(mt1_div: BeautifulSoup) -> List[str]:
         """
         Extracts a list of disciplines from the given BeautifulSoup object.
 
@@ -354,7 +358,8 @@ class MTBEventsPage(Scraper):
             return [img['alt'] for img in imgs]
         return []
 
-    def _extract_event_url(self, mt1_div: BeautifulSoup) -> Optional[str]:
+    @staticmethod
+    def _extract_event_url(mt1_div: BeautifulSoup) -> Optional[str]:
         """
         Extracts the event URL from a given BeautifulSoup div element.
 
@@ -371,7 +376,8 @@ class MTBEventsPage(Scraper):
         parent_anchor = mt1_div.find_parent('a')
         return parent_anchor.get('href') if parent_anchor else None
 
-    def _extract_results_url(self, mt1_div: BeautifulSoup) -> Optional[str]:
+    @staticmethod
+    def _extract_results_url(mt1_div: BeautifulSoup) -> Optional[str]:
         """
         Extracts the URL of the results page from the given BeautifulSoup
         object.
