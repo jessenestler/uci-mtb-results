@@ -137,18 +137,6 @@ class MTBEventsPage(Scraper):
         List[Dict]
             A list of dictionaries, each containing event details.
         """
-        return self._extract_events()
-
-    def _extract_events(self) -> List[Dict]:
-        """
-        Extract event details from the parsed HTML.
-
-        Returns
-        -------
-        List[Dict]
-            A list of dictionaries where each dictionary contains event
-            details.
-        """
         events = []
 
         # Locate the "Results by Event" heading
