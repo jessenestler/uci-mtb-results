@@ -453,10 +453,8 @@ class MTBRacesPage(Scraper):
             such as: discipline, category, gender, race type, and url.
         """
         urls = self._extract_result_urls()
-        races = self._extract_races()
+        race_info = self._extract_races()
 
-        # Parse race names
-        race_info = self._parse_race_info(races)
         return [
             RaceInfo(**{**r, 'url': u}).model_dump()
             for r, u in zip(race_info, urls)
@@ -488,9 +486,11 @@ class MTBRacesPage(Scraper):
         headers = self.soup.find_all(lambda tag: tag.name in [
             'h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
         header_text = [header.text.strip() for header in headers]
-        return list(filter(lambda x: ':' in x, header_text))
+        races = list(filter(lambda x: ':' in x, header_text))
+        return self._parse_race_info(races)
 
-    def _parse_race_info(self, names: List[str]) -> List[Dict]:
+    @staticmethod
+    def _parse_race_info(names: List[str]) -> List[Dict]:
         """
         Parses a list of race names and extracts details such as discipline,
         category, gender, and race type.
