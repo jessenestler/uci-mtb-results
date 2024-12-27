@@ -5,7 +5,7 @@ from urllib.parse import urlencode
 
 import requests
 from bs4 import BeautifulSoup
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
@@ -53,6 +53,12 @@ class RaceResult(BaseModel):
     points: Optional[int]  # Example: 250
     team: Optional[str]  # Example: "SCOTT-SRAM MTB RACING TEAM"
     details: List[Optional[Dict]]  # Split/Lap details
+
+    @field_validator("points", mode="before")
+    def convert_non_digit_to_zero(cls, value):
+        if not re.search(r"\d", str(value)):
+            return 0
+        return value
 
 
 class DocumentReadyState:
