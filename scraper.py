@@ -59,7 +59,7 @@ class RaceResult(BaseModel):
     gap: Optional[str]  # Example: "+00:00:15"
     points: Optional[int]  # Example: 250
     team: Optional[str]  # Example: "SCOTT-SRAM MTB RACING TEAM"
-    details: List[Optional[Dict]]  # Split/Lap details
+    details: List[Optional[ResultDetails]]  # Split/Lap details
 
     @field_validator("points", mode="before")
     def convert_non_digit_to_zero(cls, value):
