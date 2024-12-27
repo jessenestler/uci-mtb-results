@@ -491,8 +491,7 @@ class MTBRacesPage(Scraper):
 
     def _parse_race_info(self, names: List[str]) -> List[Dict]:
         """
-        Parses a list of race names and extracts details such as discipline,
-        category, gender, and race type.
+        Parses race information from a list of race names.
 
         Parameters
         ----------
@@ -502,27 +501,14 @@ class MTBRacesPage(Scraper):
         Returns
         -------
         List[Dict]
-            A list of dictionaries, each containing the extracted details for
-            a race. Each dictionary has the following keys:
-
-                - 'discipline': str or None
-                    The discipline of the race
-                    (e.g., "UCI World Cup", "Enduro Racing", "E-Enduro Racing")
-                    None if not found.
-                - 'category': str or None
-                    The category of the race
-                    (e.g., "Elite", "U23", "Junior", "Youth", "Master")
-                    None if not found.
-                - 'gender': str or None
-                    The gender category of the race
-                    (e.g., "Men", "Women")
-                    None if not found.
-                - 'race_type': str
-                    The type of the race
-                    (e.g., "Qualifier", "Semi-Finals", "Finals")
-                    Defaults to "Finals" if not specified.
+            A list of dictionaries containing extracted race details, each
+            containing:
+                - race_name: str
+                - discipline: str or None
+                - category: str or None
+                - gender: str or None
+                - race_type: str or None
         """
-
         extracted_details = [{
             "race_name": race_name,
             "discipline": self._extract_discipline(race_name),
@@ -534,7 +520,7 @@ class MTBRacesPage(Scraper):
         return extracted_details
 
     @staticmethod
-    def _extract_gender(race_name):
+    def _extract_gender(race_name: str) -> Optional[str]:
         """
         Extracts the gender from a race name.
 
@@ -557,7 +543,7 @@ class MTBRacesPage(Scraper):
         return match.group(1)
 
     @staticmethod
-    def _extract_category(race_name):
+    def _extract_category(race_name: str) -> Optional[str]:
         """
         Extracts the category from a race name string.
 
@@ -586,7 +572,7 @@ class MTBRacesPage(Scraper):
         return match.group(1)
 
     @staticmethod
-    def _extract_discipline(race_name):
+    def _extract_discipline(race_name: str) -> Optional[str]:
         """
         Extracts the discipline from a given race name.
 
@@ -616,7 +602,7 @@ class MTBRacesPage(Scraper):
         return match.group(1) or match.group(2)
 
     @staticmethod
-    def _extract_race_type(race_name):
+    def _extract_race_type(race_name: str) -> Optional[str]:
         """
         Extracts the race type from the given race name.
 
