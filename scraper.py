@@ -5,9 +5,54 @@ from urllib.parse import urlencode
 
 import requests
 from bs4 import BeautifulSoup
+from pydantic import BaseModel
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
+
+
+class EventDetails(BaseModel):
+    """Schema for event details."""
+    location: Optional[str]
+    start_date: Optional[datetime]
+    end_date: Optional[datetime]
+    country: Optional[str]
+    disciplines: Optional[List[str]]
+    event_url: Optional[str]
+    results_url: Optional[str]
+
+
+class RaceInfo(BaseModel):
+    """Schema for race information."""
+    discipline: Optional[str]
+    category: Optional[str]
+    gender: Optional[str]
+    race_type: str  # Defaults to "Finals" in the scraper logic
+    race_name: str
+    url: Optional[str]
+
+
+class ResultDetails(BaseModel):
+    """Schema for split/lap/stage details. Depending on the race discipline,
+    the details can be split, lap, or stage times."""
+    lap: Optional[str]  # Example: "Lap 1"
+    split: Optional[str]  # Example: "Split 1"
+    stage: Optional[str]  # Example: "Stage 1"
+    time: Optional[str]  # Example: "10:58.541"
+    gap: Optional[str]  # Example: "00:00.000"
+    position: Optional[int]  # Example: 2
+
+
+class RaceResult(BaseModel):
+    """Schema for a race's overall results."""
+    position: Optional[int]  # Example: 1
+    rider: Optional[str]  # Example: "Nino Schurter"
+    nation: Optional[str]  # Example: "CHE"
+    time: Optional[str]  # Example: "01:24:04"
+    gap: Optional[str]  # Example: "+00:00:15"
+    points: Optional[int]  # Example: 250
+    team: Optional[str]  # Example: "SCOTT-SRAM MTB RACING TEAM"
+    details: Optional[List[ResultDetails]]  # Split/Lap details
 
 
 class DocumentReadyState:
