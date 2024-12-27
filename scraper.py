@@ -80,8 +80,8 @@ class Scraper:
         options.headless = True
         return webdriver.Chrome(service=service, options=options)
 
-    def get(self, url: str, params: dict = None) -> str:
-        """Navigate to the page and return its HTML."""
+    def get(self, url: str, params: dict = None) -> BeautifulSoup:
+        """Navigate to the page and return its parsed HTML."""
         if self.use_selenium:
             # Use Selenium to get the page source
             with self._create_driver() as driver:
@@ -93,12 +93,14 @@ class Scraper:
 
                 driver.get(url)
                 wait.until(DocumentReadyState())
-                return driver.page_source
+                html = driver.page_source
         else:
             # Use requests to get the page source
             response = requests.get(url, params=params, timeout=self.timeout)
             response.raise_for_status()
-            return response.text
+            html = response.text
+
+        return BeautifulSoup(html, 'html.parser')
 
 
 class MTBEventsPage(Scraper):
