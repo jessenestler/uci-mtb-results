@@ -751,15 +751,15 @@ class MTBResultsPage(Scraper):
 
         # Iterate through rows in pairs
         for i in range(0, len(rows), 2):
-            high_level_row = rows[i]
-            rider_dict = self._extract_overall_result(headers, high_level_row)
+            overall_row = rows[i]
+            overall_dict = self._extract_overall_result(headers, overall_row)
 
             # Process details row
-            details_row = rows[i + 1]
-            race_details = self._extract_detailed_result(details_row)
-            rider_dict["details"] = race_details
+            detail_row = rows[i + 1]
+            detail_list = self._extract_detailed_result(detail_row)
+            overall_dict["details"] = detail_list
 
-            results_data.append(rider_dict)
+            results_data.append(overall_dict)
 
         return results_data
 
