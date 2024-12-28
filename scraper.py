@@ -310,34 +310,30 @@ class MTBEventsPage(Scraper):
         "Day - Day Month YYYY" or "Day Month YYYY".
         """
         details = mt1_div.find_all('div')
-        if len(details) >= 2:
-            date_range = details[0].text.strip()
+        if len(details) < 2:
+            return None
 
-            # Match the pattern "1 - 4 Month YYYY"
-            dual_day = r'(\d+)\s*-\s*(\d+)\s*([A-Za-z]+)\s*(\d{4})'
-            match = re.match(dual_day, date_range)
-            if match:
-                day_start, day_end, month, year = match.groups()
-                try:
-                    start_date = datetime.strptime(
-                        f"{day_start} {month} {year}", "%d %B %Y")
-                    end_date = datetime.strptime(
-                        f"{day_end} {month} {year}", "%d %B %Y")
-                    return start_date, end_date
-                except ValueError:
-                    return None
+        date_range = details[0].text.strip()
 
-            # If only one date is provided, e.g., "4 May 2024"
-            single_day = r'(\d+)\s*([A-Za-z]+)\s*(\d{4})'
-            match_single = re.match(single_day, date_range)
-            if match_single:
-                day, month, year = match_single.groups()
-                try:
-                    single_date = datetime.strptime(
-                        f"{day} {month} {year}", "%d %B %Y")
-                    return single_date, single_date
-                except ValueError:
-                    return None
+        # Pattern for date range within the same month
+        pattern = r'(\d+)\s*-\s*(\d+)\s*([A-Za-z]+)\s*(\d{4})'
+        match = re.match(pattern, date_range)
+        if match:
+            day_start, day_end, month, year = match.groups()
+            return (
+                datetime.strptime(f"{day_start} {month} {year}", "%d %B %Y"),
+                datetime.strptime(f"{day_end} {month} {year}", "%d %B %Y")
+            )
+
+        # Pattern for date range spanning two months
+        pattern = r'(\d+)\s*([A-Za-z]+)\s*-\s*(\d+)\s*([A-Za-z]+)\s*(\d{4})'
+        match = re.match(pattern, date_range)
+        if match:
+            day_st, month_st, day_end, month_end, year = match.groups()
+            return (
+                datetime.strptime(f"{day_st} {month_st} {year}", "%d %B %Y"),
+                datetime.strptime(f"{day_end} {month_end} {year}", "%d %B %Y")
+            )
 
         return None
 
