@@ -631,7 +631,31 @@ class MTBResultsPage(Scraper):
         self.soup = self.get(self.url)
         self.table = self._find_main_table()
 
-    def fetch_results_date(self) -> Optional[str]:
+    def fetch_results(self) -> List[Dict]:
+        """
+        Extracts the results from the provided BeautifulSoup object.
+
+        Returns
+        -------
+        List[Dict]
+            A list of dictionaries, each containing each athlete's results.
+        """
+        try:
+            headers = self._extract_headers()
+            rows = self._extract_rows(self.table)
+        except AttributeError:
+            return []
+
+        # Check if the table contains detailed results, i.e., split/lap times
+        if self._has_detailed_results(headers):
+            results = self._extract_results_with_details(headers, rows)
+        else:
+            results = self._extract_results_without_details(headers, rows)
+
+        # Validate the extracted results
+        return [RaceResult(**result).model_dump() for result in results]
+
+    def _extract_date(self) -> Optional[str]:
         """
         Extract the date of the race from first header whose text matches the
         format `text:text:text:date`.
@@ -659,30 +683,6 @@ class MTBResultsPage(Scraper):
                 continue  # Skip if it cannot be parsed as a date
 
         return None
-
-    def fetch_results(self) -> List[Dict]:
-        """
-        Extracts the results from the provided BeautifulSoup object.
-
-        Returns
-        -------
-        List[Dict]
-            A list of dictionaries, each containing each athlete's results.
-        """
-        try:
-            headers = self._extract_headers()
-            rows = self._extract_rows(self.table)
-        except AttributeError:
-            return []
-
-        # Check if the table contains detailed results, i.e., split/lap times
-        if self._has_detailed_results(headers):
-            results = self._extract_results_with_details(headers, rows)
-        else:
-            results = self._extract_results_without_details(headers, rows)
-
-        # Validate the extracted results
-        return [RaceResult(**result).model_dump() for result in results]
 
     def _has_detailed_results(self, headers: List[str]) -> bool:
         """
