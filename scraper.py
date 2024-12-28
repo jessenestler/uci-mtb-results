@@ -580,16 +580,20 @@ class MTBRacesPage(Scraper):
         in the format of "UCI <discipline> World Cup" or "<discipline> Racing",
         where <discipline> can include words and hyphens.
         """
-        discipline_pattern = (r"((?:e-)?edr(?:-e)?|dhi|xco|xcc|xcm)")
+        discipline_pattern = (r"enduro|((?:e-)?edr(?:-e)?|dhi|xco|xcc|xcm)")
 
         match = re.search(discipline_pattern, url, re.IGNORECASE)
         if not match:
             return None
 
-        if match.group(0) == "edr-e":
+        discipline = match.group(0)
+        if discipline == "edr-e":
             return "E-EDR"
 
-        return match.group(0).upper()
+        if discipline == "enduro":
+            return "EDR"
+
+        return discipline.upper()
 
     @staticmethod
     def _extract_race_type(url: str) -> Optional[str]:
