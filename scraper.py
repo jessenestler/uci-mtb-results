@@ -631,20 +631,22 @@ class MTBResultsPage(Scraper):
         self.soup = self.get(self.url)
         self.table = self._find_main_table()
 
-    def fetch_results(self) -> List[Dict]:
+    def fetch_results(self) -> dict:
         """
         Extracts the results from the provided BeautifulSoup object.
 
         Returns
         -------
-        List[Dict]
-            A list of dictionaries, each containing each athlete's results.
+        dict
+            A dictionary containg the race results and date.
         """
         try:
             headers = self._extract_headers()
             rows = self._extract_rows(self.table)
         except AttributeError:
-            return []
+            return {}
+
+        results_dict = {'date': self._extract_date()}
 
         # Check if the table contains detailed results, i.e., split/lap times
         if self._has_detailed_results(headers):
@@ -653,7 +655,10 @@ class MTBResultsPage(Scraper):
             results = self._extract_results_without_details(headers, rows)
 
         # Validate the extracted results
-        return [RaceResult(**result).model_dump() for result in results]
+        results = [RaceResult(**r).model_dump() for r in results]
+        results_dict['results'] = results
+
+        return results_dict
 
     def _extract_date(self) -> Optional[str]:
         """
