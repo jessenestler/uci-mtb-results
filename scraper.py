@@ -669,8 +669,11 @@ class MTBResultsPage(Scraper):
         List[Dict]
             A list of dictionaries, each containing each athlete's results.
         """
-        headers = self._extract_headers()
-        rows = self._extract_rows(self.table)
+        try:
+            headers = self._extract_headers()
+            rows = self._extract_rows(self.table)
+        except AttributeError:
+            return []
 
         # Check if the table contains detailed results, i.e., split/lap times
         if self._has_detailed_results(headers):
