@@ -525,19 +525,20 @@ class MTBRacesPage(Scraper):
         return match.group(0).title()
 
     @staticmethod
-    def _extract_category(race_name: str) -> Optional[str]:
+    def _extract_category(url: str) -> Optional[str]:
         """
         Extracts the category from a race name string.
 
         Parameters
         ----------
-        race_name : str
-            The name of the race from which to extract the category.
+        url : str
+            The race url from which to extract the category.
 
         Returns
         -------
-        str or None
-            The extracted category if a match is found, otherwise None.
+        str
+            The extracted category if a match is found. Defaults to 'Open' if
+            no specific category is found.
 
         Notes
         -----
@@ -546,12 +547,20 @@ class MTBRacesPage(Scraper):
         case-insensitive manner.
         """
 
-        category_pattern = r"(Elite|U\d+|Junior|Youth|Master[s]?\s\d+\+)"
+        category_pattern = r"(Elite|U\d+|Junior|Youth|Master[s]?-\d+)"
 
-        match = re.search(category_pattern, race_name, re.IGNORECASE)
+        match = re.search(category_pattern, url, re.IGNORECASE)
         if not match:
-            return None
-        return match.group(1)
+            return "Open"
+
+        category = match.group(0).title()
+        if "master" in match.group(0):
+            return f'{category.replace("-", " ")}+ Open'
+
+        if any(x in url for x in ["open", "-1/", "youth", "junior"]):
+            return f"{category} Open"
+
+        return category
 
     @staticmethod
     def _extract_discipline(url: str) -> Optional[str]:
