@@ -557,7 +557,7 @@ class MTBRacesPage(Scraper):
         if "master" in match.group(0):
             return f'{category.replace("-", " ")}+ Open'
 
-        if any(x in url for x in ["open", "-1/", "youth", "junior"]):
+        if any(x in url for x in ["open", "-1/", "youth"]):
             return f"{category} Open"
 
         return category
