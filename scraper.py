@@ -896,9 +896,17 @@ class MTBResultsPage(Scraper):
     @staticmethod
     def _extract_rider_and_team(row: BeautifulSoup) -> Optional[str]:
         """Extract the rider and team name from the row."""
+        # Extract the rider and team information from links
         links = row.find_all('a', recursive=True, href=True)
-        rider = links[1].text.strip().title() if links else ''
-        team = links[2].text.strip() if links and len(links) > 2 else ''
+        rider, team = None, None
+
+        if links:
+            rider = links[1].text.strip().title()
+            if len(links) > 2:
+                team = links[2].text.strip()
+        else:
+            rider = row.find_all('td')[1].text.strip().title()
+
         return {"rider": rider, "team": team}
 
     def _parse_result_details(self, nested_table):
