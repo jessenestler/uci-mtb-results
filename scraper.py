@@ -502,14 +502,14 @@ class MTBRacesPage(Scraper):
         return extracted_details
 
     @staticmethod
-    def _extract_gender(race_name: str) -> Optional[str]:
+    def _extract_gender(url: str) -> Optional[str]:
         """
         Extracts the gender from a race name.
 
         Parameters
         ----------
-        race_name : str
-            The name of the race from which to extract the gender.
+        url : str
+            The race url from which to extract the gender.
 
         Returns
         -------
@@ -517,12 +517,12 @@ class MTBRacesPage(Scraper):
             Returns 'Men' or 'Women' if found in the race name, otherwise
             returns None.
         """
-        gender_pattern = r"(Men|Women)"
+        gender_pattern = r"(men|women)"
 
-        match = re.search(gender_pattern, race_name, re.IGNORECASE)
+        match = re.search(gender_pattern, url, re.IGNORECASE)
         if not match:
             return None
-        return match.group(1)
+        return match.group(0).title()
 
     @staticmethod
     def _extract_category(race_name: str) -> Optional[str]:
