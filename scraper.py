@@ -554,14 +554,14 @@ class MTBRacesPage(Scraper):
         return match.group(1)
 
     @staticmethod
-    def _extract_discipline(race_name: str) -> Optional[str]:
+    def _extract_discipline(url: str) -> Optional[str]:
         """
         Extracts the discipline from a given race name.
 
         Parameters
         ----------
-        race_name : str
-            The name of the race from which to extract the discipline.
+        url : str
+            The race url from which to extract the discipline.
 
         Returns
         -------
@@ -575,13 +575,16 @@ class MTBRacesPage(Scraper):
         in the format of "UCI <discipline> World Cup" or "<discipline> Racing",
         where <discipline> can include words and hyphens.
         """
-        discipline_pattern = (r"UCI\s([\w-]+)\sWorld\sCup|"
-                              r"((?:E-)?Enduro\s[\w-]+)\sRacing")
+        discipline_pattern = (r"((?:e-)?edr(?:-e)?|dhi|xco|xcc|xcm)")
 
-        match = re.match(discipline_pattern, race_name)
+        match = re.search(discipline_pattern, url, re.IGNORECASE)
         if not match:
             return None
-        return match.group(1) or match.group(2)
+
+        if match.group(0) == "edr-e":
+            return "E-EDR"
+
+        return match.group(0).upper()
 
     @staticmethod
     def _extract_race_type(race_name: str) -> Optional[str]:
