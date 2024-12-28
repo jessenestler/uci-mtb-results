@@ -640,19 +640,8 @@ class MTBResultsPage(Scraper):
         dict
             A dictionary containg the race results and date.
         """
-        try:
-            headers = self._extract_headers()
-            rows = self._extract_rows(self.table)
-        except AttributeError:
-            return {}
-
         results_dict = {'date': self._extract_date()}
-
-        # Check if the table contains detailed results, i.e., split/lap times
-        if self._has_detailed_results(headers):
-            results = self._extract_results_with_details(headers, rows)
-        else:
-            results = self._extract_results_without_details(headers, rows)
+        results = self._extract_race_results()
 
         # Validate the extracted results
         results = [RaceResult(**r).model_dump() for r in results]
@@ -738,6 +727,32 @@ class MTBResultsPage(Scraper):
         headers = [header.lower() for header in headers]
         details = ['splits', 'laps', 'stages']
         return any(keyword in headers for keyword in details)
+
+    def _extract_race_results(self):
+        """
+        Extracts race results from the given headers and rows.
+
+        Returns
+        -------
+        results : list
+            A list of dictionaries containing the extracted race results.
+            The structure of the dictionaries depends on whether detailed
+            results are available.
+        """
+        # Extract headers and rows
+        try:
+            headers = self._extract_headers()
+            rows = self._extract_rows(self.table)
+        except AttributeError:
+            return {}
+
+        # Check if the table has detailed results
+        if self._has_detailed_results(headers):
+            results = self._extract_results_with_details(headers, rows)
+        else:
+            results = self._extract_results_without_details(headers, rows)
+
+        return results
 
     def _extract_results_without_details(self, headers: list,
                                          rows: BeautifulSoup) -> List[Dict]:
