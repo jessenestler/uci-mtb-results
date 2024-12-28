@@ -587,14 +587,14 @@ class MTBRacesPage(Scraper):
         return match.group(0).upper()
 
     @staticmethod
-    def _extract_race_type(race_name: str) -> Optional[str]:
+    def _extract_race_type(url: str) -> Optional[str]:
         """
         Extracts the race type from the given race name.
 
         Parameters
         ----------
-        race_name : str
-            The name of the race from which to extract the race type.
+        url : str
+            The race url from which to extract the race type.
 
         Returns
         -------
@@ -603,12 +603,12 @@ class MTBRacesPage(Scraper):
             or "Finals". Defaults to "Finals" if no specific race type is
             found.
         """
-        type_pattern = r"(Qualifier|Semi-Finals|Finals)"
+        type_pattern = r"(qualifier|semi-finals|finals)"
 
-        match = re.search(type_pattern, race_name, re.IGNORECASE)
+        match = re.search(type_pattern, url, re.IGNORECASE)
         if not match:
             return "Finals"
-        return match.group(1)
+        return match.group(0).title()
 
 
 class MTBResultsPage(Scraper):
