@@ -33,6 +33,14 @@ Section 3.2 of the [UCI Terms](https://ucimtbworldseries.com/terms) dictate that
 
 As such, no race results are posted in this repo. Rather, you may use the code in this repo to scrape results for your own use, as the UCI's [`robots.txt`](https://ucimtbworldseries.com/robots.txt) allows all user agents unrestricted access.
 
+### Scrape by Year
+
+```bash
+uv run app.py 2024
+```
+
+*Note:* The UCI does not host any results prior to 2023.
+
 ### Event Scraping
 
 ```python
