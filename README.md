@@ -61,4 +61,7 @@ print(results)
 
 ## Future Improvements
 
+- Scrape race metadata including:
+  - Course maps
+  - Stage information
 - Add automated testing using pytest.
