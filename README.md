@@ -27,6 +27,12 @@ uv install
 
 ## Usage
 
+Section 3.2 of the [UCI Terms](https://ucimtbworldseries.com/terms) dictate that:
+
+> You are not allowed to reproduce, copy, sell, modify, re-edit, communicate, distribute or use, in any way whatsoever, any content on or from the Website (including, but not limited to, logos, service marks, trademarks, trade names, photographs, illustrations, videos, articles and associated code and software), in whole or in part, otherwise than as provided for in these Terms, without our express prior written consent.
+
+As such, no race results are posted in this repo. Rather, you may use the code in this repo to scrape results for your own use, as the UCI's [`robots.txt`](https://ucimtbworldseries.com/robots.txt) allows all user agents unrestricted access.
+
 ### Event Scraping
 
 ```python
