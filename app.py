@@ -75,6 +75,15 @@ if __name__ == "__main__":
                     f"_{race['race_type']}")
             name = re.sub(r'\s+|-', '_', name).lower()
 
+            # Create a folder and file for the race
+            race_folder = event_folder / "results" / race['discipline']
+            race_folder.mkdir(parents=True, exist_ok=True)
+            race_file = race_folder / f"{name}.json"
+
+            # Skip if the file already exists
+            if race_file.exists():
+                continue
+
             # Fetch race results
             print(f"Extracting results for {event['location']} {name}...")
             page = MTBResultsPage(race['url'])
