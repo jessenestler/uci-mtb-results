@@ -62,7 +62,7 @@ if __name__ == "__main__":
         event_num = num + 1
 
         # Create a folder for each event for the year
-        location = re.sub(r'\s?-\s?|\s+', '_', event["location"]) \
+        location = re.sub(r'[\s\-\–]+', '_', event["location"]) \
                      .replace(",", "") \
                      .lower()
         event_folder = year_folder / f"{event_num:02d}_{location}"
