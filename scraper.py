@@ -1,5 +1,5 @@
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 from urllib.parse import urlencode
 
@@ -20,6 +20,43 @@ class BaseModelWithValidation(BaseModel):
         baddies = ["", "-"]
         return {key: None if value in baddies else value
                 for key, value in values.items()}
+
+    @field_validator("time", "gap", mode="before", check_fields=False)
+    def parse_time_string(time_str: str) -> timedelta:
+        """
+        Parse a time string into a timedelta object, supporting optional days,
+        hours, and minutes.
+
+        Args:
+            time_str (str): The time string to parse (e.g., "1:12:34:56.789",
+            "34:56.789", "56.789").
+
+        Returns:
+            timedelta: A timedelta object representing the parsed time.
+        """
+        if not time_str:
+            return None
+
+        # Remove any leading '+' or '-' and capture the sign
+        sign = 1
+        if time_str.startswith(('+', '-')):
+            sign = -1 if time_str[0] == '-' else 1
+            time_str = time_str[1:]
+
+        # Split the time string by colons, reversed so that seconds are first
+        parts = reversed(list(map(float, time_str.split(':'))))
+
+        # Define conversion factors to seconds for each part:
+        # [seconds, minutes, hours, days]
+        multipliers = [1, 60, 3600, 86400]
+
+        # Calculate total seconds by aligning multipliers with parts
+        total_seconds = sign * sum(
+            part * multiplier
+            for part, multiplier in zip(parts, multipliers)
+        )
+
+        return timedelta(seconds=total_seconds)
 
 
 class EventDetails(BaseModel):
@@ -46,8 +83,8 @@ class ResultDetails(BaseModelWithValidation):
     """Schema for split/lap/stage details. Depending on the race discipline,
     the details can be split, lap, or stage times."""
     section: Optional[str]  # Example: "Lap 1"
-    time: Optional[str]  # Example: "10:58.541"
-    gap: Optional[str]  # Example: "00:00.000"
+    time: Optional[timedelta]
+    gap: Optional[timedelta]
     position: Optional[int]  # Example: 2
 
     @model_validator(mode="before")
@@ -65,8 +102,8 @@ class RaceResult(BaseModelWithValidation):
     position: Optional[str] = Field(alias="#")  # Example: 1
     rider: Optional[str]  # Example: "Nino Schurter"
     nation: Optional[str]  # Example: "CHE"
-    time: Optional[str]  # Example: "01:24:04"
-    gap: Optional[str]  # Example: "+00:00:15"
+    time: Optional[timedelta]
+    gap: Optional[timedelta]
     points: Optional[int]  # Example: 250
     team: Optional[str]  # Example: "SCOTT-SRAM MTB RACING TEAM"
     details: List[Optional[ResultDetails]]  # Split/Lap details
