@@ -73,7 +73,7 @@ if __name__ == "__main__":
         event_folder.mkdir(parents=True, exist_ok=True)
 
         # Extract results for each race
-        for race in event['races']:
+        for i, race in enumerate(event['races']):
             # Define a name for the race
             name = (f"{race['discipline']}_{race['gender']}_{race['category']}"
                     f"_{race['race_type']}")
@@ -86,6 +86,11 @@ if __name__ == "__main__":
 
             # Skip if the file already exists
             if race_file.exists():
+                # Load the results from the file into the event object
+                # so that we can save the event object to a file with
+                # complete information
+                with open(race_file, "r") as f:
+                    event['races'][i] = json.load(f)
                 continue
 
             # Fetch race results
