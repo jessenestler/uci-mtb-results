@@ -1,16 +1,20 @@
 import argparse
 import json
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
+
+from isodate import duration_isoformat
 
 from scraper import MTBEventsPage, MTBRacesPage, MTBResultsPage
 
 
 def custom_serializer(obj):
-    """Custom JSON serializer for datetime objects"""
+    """Custom JSON serializer for wonky data types."""
     if isinstance(obj, datetime):
-        return obj.date().isoformat()  # Convert datetime to ISO 8601 string
+        return obj.date().isoformat()  # Convert datetime to ISO 8601 date
+    if isinstance(obj, timedelta):
+        return duration_isoformat(obj)  # Convert timedelta to ISO 8601 period
     raise TypeError(f"Type {type(obj)} not serializable")
 
 
